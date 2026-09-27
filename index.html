@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="A simple free-tier AI agent with persistent memory.">
+  <title>Free AI Agent</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">✦</div>
+        <div>
+          <strong>Free AI Agent</strong>
+          <span>Cloudflare + Supabase</span>
+        </div>
+      </div>
+
+      <button class="new-chat" id="newChatBtn">＋ New chat</button>
+
+      <div class="sidebar-label">Your chats</div>
+      <div id="conversationList" class="conversation-list"></div>
+
+      <div class="sidebar-footer">
+        <button class="text-button" id="clearLocalBtn">Reset local identity</button>
+        <span>Free-tier prototype</span>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-button mobile-only" id="menuBtn" aria-label="Open menu">☰</button>
+        <div class="topbar-title">
+          <span class="status-dot"></span>
+          <span id="currentTitle">New chat</span>
+        </div>
+        <button class="icon-button" id="clearChatBtn" title="Clear current chat">⌫</button>
+      </header>
+
+      <section class="chat" id="chat">
+        <div class="welcome" id="welcome">
+          <div class="welcome-icon">✦</div>
+          <h1>How can I help?</h1>
+          <p>I can chat with you and remember useful facts you explicitly ask me to remember.</p>
+          <div class="suggestions">
+            <button data-prompt="What can you do?">What can you do?</button>
+            <button data-prompt="Remember that I like simple explanations.">Remember something</button>
+            <button data-prompt="Give me three ideas for a small web project.">Give me ideas</button>
+          </div>
+        </div>
+      </section>
+
+      <div class="composer-wrap">
+        <form class="composer" id="composer">
+          <textarea id="messageInput" rows="1" maxlength="8000"
+            placeholder="Message the AI..." autocomplete="off"></textarea>
+          <button class="send-button" id="sendBtn" type="submit" aria-label="Send">➤</button>
+        </form>
+        <div class="composer-note">AI responses use a free OpenRouter model. Free model availability and limits can change.</div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
