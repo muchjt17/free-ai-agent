@@ -1,5 +1,7 @@
 # Standalone Free AI Agent
 
+**Version:** 1.1 — explicit conversational free-model fallback
+
 A small ChatGPT-style AI agent built with:
 
 - Cloudflare Pages + Pages Functions
@@ -32,11 +34,15 @@ The application stores conversations, messages and memories there.
 
 Create an OpenRouter API key.
 
-The backend uses:
+The backend explicitly uses general-purpose free conversational models instead of `openrouter/free`.
 
-    openrouter/free
+Current fallback order:
 
-This selects an available free model. Free model availability and rate limits can change.
+    minimax/minimax-m3:free
+    qwen/qwen3.8-27b:free
+    google/gemma-4-26b-a4b:free
+
+This avoids accidentally routing normal chat to a specialized safety/classification model. Free model availability and rate limits can change.
 
 ## 3. Create a Cloudflare Pages project
 

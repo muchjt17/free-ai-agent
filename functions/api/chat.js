@@ -66,32 +66,54 @@ async function saveMemory(env, userId, text) {
 }
 
 async function callOpenRouter(env, messages) {
-  const body = {
-    model: "openrouter/free",
-    messages,
-    temperature: 0.7,
-    max_tokens: 1200
-  };
+  // Do not use openrouter/free here: it can select specialized models,
+  // including safety/classification models. Use explicit general chat models.
+  const models = [
+    "minimax/minimax-m3:free",
+    "qwen/qwen3.8-27b:free",
+    "google/gemma-4-26b-a4b:free"
+  ];
 
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${env.OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json",
-      "HTTP-Referer": env.APP_URL || "https://localhost",
-      "X-Title": env.APP_NAME || "Free AI Agent"
-    },
-    body: JSON.stringify(body)
-  });
+  let lastError = null;
 
-  const text = await response.text();
-  let data = null;
-  try { data = JSON.parse(text); } catch {}
-  if (!response.ok) {
-    const message = data?.error?.message || data?.error || text || `OpenRouter error ${response.status}`;
-    throw new Error(message);
+  for (const model of models) {
+    try {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": env.APP_URL || "https://localhost",
+          "X-Title": env.APP_NAME || "Free AI Agent"
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          temperature: 0.7,
+          max_tokens: 1200
+        })
+      });
+
+      const raw = await response.text();
+      let data = null;
+      try { data = JSON.parse(raw); } catch {}
+
+      if (!response.ok) {
+        lastError = new Error(
+          data?.error?.message || data?.error || raw || `OpenRouter error ${response.status}`
+        );
+        continue;
+      }
+
+      const reply = data?.choices?.[0]?.message?.content?.trim();
+      if (reply) return reply;
+      lastError = new Error(`Model ${model} returned an empty response.`);
+    } catch (error) {
+      lastError = error;
+    }
   }
-  return data?.choices?.[0]?.message?.content?.trim() || "I didn't receive a response.";
+
+  throw lastError || new Error("All configured free chat models failed.");
 }
 
 export async function onRequestPost(context) {
