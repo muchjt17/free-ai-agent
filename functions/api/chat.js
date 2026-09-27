@@ -66,12 +66,11 @@ async function saveMemory(env, userId, text) {
 }
 
 async function callOpenRouter(env, messages) {
-  // Do not use openrouter/free here: it can select specialized models,
-  // including safety/classification models. Use explicit general chat models.
+  // Use an explicit general-purpose model instead of openrouter/free,
+  // which can route requests to specialized models.
+  // This is the exact current OpenRouter ID for NVIDIA Nemotron 3 Ultra.
   const models = [
-    "minimax/minimax-m3:free",
-    "qwen/qwen3.8-27b:free",
-    "google/gemma-4-26b-a4b:free"
+    "nvidia/nemotron-3-ultra-550b-a55b:free"
   ];
 
   let lastError = null;
